@@ -7,13 +7,13 @@ characteristics and prices.
 Source: Mercado Libre.
 """
 
-from scrape_utils import Driver
+from Driver import WebDriver
 
-driver = Driver('.\ChromeDriver\chromedriver')
+driver = WebDriver('.\ChromeDriver\chromedriver')
 
-driver.start('https://www.mercadolibre.com.ar/')
+driver.goTo('https://www.mercadolibre.com.ar/')
 driver.search('CELULARES')
 
-driver.collect_data()
+datos = driver.collect_data()
 
 driver.quit()
