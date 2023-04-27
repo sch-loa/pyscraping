@@ -10,8 +10,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
 class Driver():
-    def __init__(self):
-        self.service = Service('.\ChromeDriver\chromedriver')
+    def __init__(self, chromedriver):
+        self.service = Service(chromedriver)
         self.options = Options()
 
         self.options.add_argument('--ignore-certificate-errors')
@@ -25,8 +25,15 @@ class Driver():
         
         self.wait.until(ec.presence_of_element_located((By.TAG_NAME, 'body')))
 
-        self.driver.find_element(By.CLASS_NAME, 'nav-menu-categories-link')
-    
+    def __get_search_bar(self):
+        return self.driver.find_element(By.ID, 'cb1-edit')
+
+    def search(self, element):
+        search_bar = self.__get_search_bar()
+
+        search_bar.send_keys(element)
+        search_bar.send_keys(Keys.RETURN)
+        
 
     def quit(self):
         self.driver.quit()

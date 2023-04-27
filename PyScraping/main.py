@@ -9,10 +9,9 @@ Source: Mercado Libre.
 
 from scrape_utils import Driver
 
-driver = Driver()
-
+driver = Driver('.\ChromeDriver\chromedriver')
 
 driver.start('https://www.mercadolibre.com.ar/')
-
+driver.search('CELULARES')
 
 driver.quit()
