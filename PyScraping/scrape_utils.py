@@ -33,6 +33,14 @@ class Driver():
 
         search_bar.send_keys(element)
         search_bar.send_keys(Keys.RETURN)
+    
+    def __get_elements(self):
+        elements = self.driver.find_elements(By.XPATH, '//ol/li//a[@class="ui-search-link"]')
+        elements[0].send_keys(Keys.RETURN)
+
+    def collect_data(self):
+        elements = self.__get_elements()
+        return 0
         
 
     def quit(self):

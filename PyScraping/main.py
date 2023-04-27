@@ -14,4 +14,6 @@ driver = Driver('.\ChromeDriver\chromedriver')
 driver.start('https://www.mercadolibre.com.ar/')
 driver.search('CELULARES')
 
+driver.collect_data()
+
 driver.quit()
