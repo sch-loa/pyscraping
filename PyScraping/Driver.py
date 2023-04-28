@@ -31,13 +31,15 @@ class WebDriver():
         search_bar.send_keys(Keys.RETURN)
     
     def collect_data(self):
-        element_links = self.__get_elements('//ol/li//a[@class="ui-search-link"]')
+        element_link_xpath = '//ol/li//a[@class="ui-search-item__group__element shops__items-group-details ui-search-link"]'
+        element_links = self.__get_elements(element_link_xpath)
         featured_elements = list()
-        abc = self.__check_features(element_links[0])
-        #for i in elements:
-        #featured_elements.append(self.__check_features(elements[0]))
-
-        return abc
+        
+        for element in element_links[:3]:
+            featured_elements.append(self.__get_features(element))
+            element_links = self.__get_elements(element_link_xpath)
+        
+        return featured_elements
         
     def quit(self):
         self.driver.quit()
@@ -51,26 +53,31 @@ class WebDriver():
     def __waitFor(self, el_xpath):
         self.wait.until(ec.presence_of_element_located((By.XPATH, el_xpath)))
 
-    def __check_features(self, element):
+    def __get_features(self, element):
         feat_bttn_xpath = '//a[contains(@class,"ui-pdp-media__action")]'
-        
-        element.send_keys(Keys.RETURN)
         data_tables_xpath = '//table/tbody[@class="andes-table__body"]'
+
+        element.send_keys(Keys.CONTROL + Keys.RETURN)
+        self.driver.switch_to.window(self.driver.window_handles[1])
+        
         self.__waitFor(feat_bttn_xpath)
-
         self.__get_element(feat_bttn_xpath).send_keys(Keys.RETURN)
-        self.__waitFor(data_tables_xpath)
 
+        self.__waitFor(data_tables_xpath)
         data_tables = self.__get_elements(data_tables_xpath)
+
         data_dictionary = dict()
         for data_table in data_tables:
             data_rows = data_table.find_elements(By.XPATH, './/tr[contains(@class,"andes-table__row")]')
-            print(data_table.get_attribute('innerHTML'))
+
             for cells in data_rows:
                 data_key = cells.find_element(By.XPATH, './/th[contains(@class, "andes-table__header")]').text
                 data_value = cells.find_element(By.XPATH, './/td/span[contains(@class, "andes-table__column")]').text
                 data_dictionary[data_key] = data_value
-                print(data_key)
-                print(data_value)
+        
+        print(data_dictionary)
+
+        self.driver.close()
+        self.driver.switch_to.window(self.driver.window_handles[0])
         
         return data_dictionary
