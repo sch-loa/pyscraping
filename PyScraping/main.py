@@ -16,4 +16,5 @@ driver.search('CELULARES')
 
 datos = driver.collect_data()
 
+print(datos)
 driver.quit()

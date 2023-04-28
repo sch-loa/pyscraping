@@ -18,20 +18,32 @@ class WebDriver():
         self.options.add_argument('--ignore-ssl-errors')
 
         self.driver = webdriver.Chrome(service = self.service, options = self.options)
-        self.wait = WebDriverWait(self.driver, 10)
+        self.wait = WebDriverWait(self.driver, 15)
 
     def goTo(self, webpage_link):
         self.driver.get(webpage_link)
         self.__waitFor('//body')
-
-    def __get_search_bar(self, el_path):
-        return self.driver.find_element(By.XPATH, el_path)
-
+        
     def search(self, element):
-        search_bar = self.__get_search_bar('//input[@class="nav-search-input"]')
+        search_bar = self.__get_element('//input[@class="nav-search-input"]')
 
         search_bar.send_keys(element)
         search_bar.send_keys(Keys.RETURN)
+    
+    def collect_data(self):
+        element_links = self.__get_elements('//ol/li//a[@class="ui-search-link"]')
+        featured_elements = list()
+        abc = self.__check_features(element_links[0])
+        #for i in elements:
+        #featured_elements.append(self.__check_features(elements[0]))
+
+        return abc
+        
+    def quit(self):
+        self.driver.quit()
+
+    def __get_element(self, el_xpath):
+        return self.driver.find_element(By.XPATH, el_xpath)
     
     def __get_elements(self, el_xpath):
         return self.driver.find_elements(By.XPATH, el_xpath)
@@ -39,45 +51,26 @@ class WebDriver():
     def __waitFor(self, el_xpath):
         self.wait.until(ec.presence_of_element_located((By.XPATH, el_xpath)))
 
-    def __get_feat_bttn(self, el_xpath):
-        return self.driver.find_element(By.XPATH, el_xpath)
-
     def __check_features(self, element):
-        feat_bttn_xpath = '//a[@class="ui-pdp-media__action ui-vpp-highlighted-specs__features-action"]'
+        feat_bttn_xpath = '//a[contains(@class,"ui-pdp-media__action")]'
         
         element.send_keys(Keys.RETURN)
+        data_tables_xpath = '//table/tbody[@class="andes-table__body"]'
         self.__waitFor(feat_bttn_xpath)
 
-        self.__get_feat_bttn(feat_bttn_xpath).send_keys(Keys.RETURN)
+        self.__get_element(feat_bttn_xpath).send_keys(Keys.RETURN)
+        self.__waitFor(data_tables_xpath)
 
+        data_tables = self.__get_elements(data_tables_xpath)
+        data_dictionary = dict()
+        for data_table in data_tables:
+            data_rows = data_table.find_elements(By.XPATH, './/tr[contains(@class,"andes-table__row")]')
+            print(data_table.get_attribute('innerHTML'))
+            for cells in data_rows:
+                data_key = cells.find_element(By.XPATH, './/th[contains(@class, "andes-table__header")]').text
+                data_value = cells.find_element(By.XPATH, './/td/span[contains(@class, "andes-table__column")]').text
+                data_dictionary[data_key] = data_value
+                print(data_key)
+                print(data_value)
         
-        """
-        brand = element.send_keys(Keys.)
-        line =
-        model =
-        ram =
-        storage = 
-        price =
-
-        template = {'brand': brand,
-                    'line': line,
-                    'model': model,
-                    'ram': ram,
-                    'storage': storage,
-                    'price': price}
-
-        return template
-        """
-
-    def collect_data(self):
-        elements = self.__get_elements('//ol/li//a[@class="ui-search-link"]')
-        featured_elements = list()
-        self.__check_features(elements[0])
-        #for i in elements:
-        #featured_elements.append(self.__check_features(elements[0]))
-
-        return featured_elements
-        
-
-    def quit(self):
-        self.driver.quit()
+        return data_dictionary
