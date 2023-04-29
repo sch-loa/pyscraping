@@ -8,13 +8,16 @@ Source: Mercado Libre.
 """
 
 from Driver import WebDriver
+from DataFrameManager import DataFrameManager
 
 driver = WebDriver('.\ChromeDriver\chromedriver')
 
 driver.goTo('https://www.mercadolibre.com.ar/')
 driver.search('CELULARES')
+datos = driver.collect_data(3)
 
-datos = driver.collect_data()
+data_frame = DataFrameManager()
+data_frame.append(datos)
+data_frame.export()
 
-print(datos)
 driver.quit()

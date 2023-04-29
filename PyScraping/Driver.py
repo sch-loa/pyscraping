@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
-class WebDriver():
+class WebDriver:
     def __init__(self, chromedriver):
         self.service = Service(chromedriver)
         self.options = Options()
@@ -21,8 +21,11 @@ class WebDriver():
         self.wait = WebDriverWait(self.driver, 15)
 
     def goTo(self, webpage_link):
-        self.driver.get(webpage_link)
-        self.__waitFor('//body')
+        try:
+            self.driver.get(webpage_link)
+            self.__waitFor('//body')
+        except TimeoutError:
+            print('Loading timed out. Process was cancelled.')
         
     def search(self, element):
         search_bar = self.__get_element('//input[@class="nav-search-input"]')
@@ -30,12 +33,12 @@ class WebDriver():
         search_bar.send_keys(element)
         search_bar.send_keys(Keys.RETURN)
     
-    def collect_data(self):
+    def collect_data(self, occurrs):
         element_link_xpath = '//ol/li//a[@class="ui-search-item__group__element shops__items-group-details ui-search-link"]'
         element_links = self.__get_elements(element_link_xpath)
         featured_elements = list()
         
-        for element in element_links[:3]:
+        for element in element_links[:occurrs]:
             featured_elements.append(self.__get_features(element))
             element_links = self.__get_elements(element_link_xpath)
         
@@ -43,30 +46,31 @@ class WebDriver():
         
     def quit(self):
         self.driver.quit()
+    
+    def __moveTo(self, window):
+        self.driver.switch_to.window(self.driver.window_handles[window])
 
     def __get_element(self, el_xpath):
+        self.__waitFor(el_xpath)
         return self.driver.find_element(By.XPATH, el_xpath)
     
     def __get_elements(self, el_xpath):
+        self.__waitFor(el_xpath)
         return self.driver.find_elements(By.XPATH, el_xpath)
     
     def __waitFor(self, el_xpath):
         self.wait.until(ec.presence_of_element_located((By.XPATH, el_xpath)))
 
     def __get_features(self, element):
-        feat_bttn_xpath = '//a[contains(@class,"ui-pdp-media__action")]'
-        data_tables_xpath = '//table/tbody[@class="andes-table__body"]'
-
         element.send_keys(Keys.CONTROL + Keys.RETURN)
-        self.driver.switch_to.window(self.driver.window_handles[1])
+        self.__moveTo(1)
         
-        self.__waitFor(feat_bttn_xpath)
-        self.__get_element(feat_bttn_xpath).send_keys(Keys.RETURN)
+        self.__get_element('//span[contains(@class,"ui-pdp-collapsable__action")]').send_keys(Keys.RETURN)
 
-        self.__waitFor(data_tables_xpath)
-        data_tables = self.__get_elements(data_tables_xpath)
+        data_tables = self.__get_elements('//table/tbody[@class="andes-table__body"]')
 
         data_dictionary = dict()
+
         for data_table in data_tables:
             data_rows = data_table.find_elements(By.XPATH, './/tr[contains(@class,"andes-table__row")]')
 
@@ -74,10 +78,8 @@ class WebDriver():
                 data_key = cells.find_element(By.XPATH, './/th[contains(@class, "andes-table__header")]').text
                 data_value = cells.find_element(By.XPATH, './/td/span[contains(@class, "andes-table__column")]').text
                 data_dictionary[data_key] = data_value
-        
-        print(data_dictionary)
 
         self.driver.close()
-        self.driver.switch_to.window(self.driver.window_handles[0])
+        self.__moveTo(0)
         
         return data_dictionary
