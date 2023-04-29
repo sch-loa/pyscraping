@@ -14,5 +14,5 @@ class DataFrameManager:
                 self.dataframe = pd.concat([self.dataframe, data_dict], axis = 0, ignore_index = True)
     
     def export(self):
-        self.dataframe.to_excel('featured_products.xlsx', sheet_name= str(datetime.today().date()))
+        self.dataframe.to_excel('featured_products.xlsx', sheet_name = str(datetime.today().date()))
 
