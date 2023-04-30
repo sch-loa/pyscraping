@@ -14,7 +14,7 @@ driver = WebDriver('.\ChromeDriver\chromedriver')
 
 driver.goTo('https://www.mercadolibre.com.ar/')
 driver.search('CELULARES')
-datos = driver.collect_data(25)
+datos = driver.collect_data(60)
 
 data_frame = DataFrameManager()
 data_frame.append(datos)

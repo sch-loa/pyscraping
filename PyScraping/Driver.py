@@ -35,13 +35,23 @@ class WebDriver:
     
     def collect_data(self, occurrs):
         element_link_xpath = '//ol/li//a[@class="ui-search-item__group__element shops__items-group-details ui-search-link"]'
-        element_links = self.__get_elements(element_link_xpath)
+        next_page_bttn_xpath = '//ul/li[contains(@class, "andes-pagination__button--next")]//a[contains(@class, "andes-pagination__link")]'
         featured_elements = list()
-        
-        for element in element_links[:occurrs]:
-            featured_elements.append(self.__get_features(element))
+
+        while(occurrs > 0):
             element_links = self.__get_elements(element_link_xpath)
-        
+
+            for element in element_links:
+                featured_elements.append(self.__get_features(element))
+                element_links = self.__get_elements(element_link_xpath)
+
+                occurrs -= 1
+
+                if(occurrs == 0):
+                    break
+
+            next_page_bttn = self.__get_element(next_page_bttn_xpath)
+            next_page_bttn.send_keys(Keys.RETURN)
         return featured_elements
         
     def quit(self):
