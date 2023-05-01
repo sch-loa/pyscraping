@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 from datetime import datetime
 
 class DataFrameManager:
@@ -14,5 +15,9 @@ class DataFrameManager:
                 self.dataframe = pd.concat([self.dataframe, data_dict], axis = 0, ignore_index = True)
     
     def export(self):
-        self.dataframe.to_excel('featured_products.xlsx', sheet_name = str(datetime.today().date()))
+        dirr = './DataBases/'
+        if(not os.path.exists(dirr)):
+            os.makedirs(dirr)
+        date_and_hour = datetime.now().strftime('(%Y-%m-%d_%Hhs%Mmins)')
+        self.dataframe.to_excel(f'{dirr}featured_products_{date_and_hour}.xlsx', sheet_name = date_and_hour)
 

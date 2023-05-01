@@ -89,6 +89,9 @@ class WebDriver:
                 data_value = cells.find_element(By.XPATH, './/td/span[contains(@class, "andes-table__column")]').text
                 data_dictionary[data_key] = data_value
 
+                price = self.__get_element('//div[@class="ui-pdp-price__second-line"]//span[@class="andes-money-amount__fraction"]')
+                data_dictionary["Precio"] = price.text
+
         self.driver.close()
         self.__moveTo(0)
         

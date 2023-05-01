@@ -10,11 +10,14 @@ Source: Mercado Libre.
 from Driver import WebDriver
 from DataFrameManager import DataFrameManager
 
+product = input("Name of the product: ")
+occurrs = int(input("Maximum number of occurrences: "))
+
 driver = WebDriver('.\ChromeDriver\chromedriver')
 
 driver.goTo('https://www.mercadolibre.com.ar/')
-driver.search('CELULARES')
-datos = driver.collect_data(60)
+driver.search(product)
+datos = driver.collect_data(occurrs)
 
 data_frame = DataFrameManager()
 data_frame.append(datos)
