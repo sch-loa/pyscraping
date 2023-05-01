@@ -75,9 +75,12 @@ class WebDriver:
         element.send_keys(Keys.CONTROL + Keys.RETURN)
         self.__moveTo(1)
         
-        self.__get_element('//span[contains(@class,"ui-pdp-collapsable__action")]').send_keys(Keys.RETURN)
+        try:
+            self.__get_element('//span[contains(@class,"ui-pdp-collapsable__action")]').send_keys(Keys.RETURN)
+        except:
+            pass
 
-        data_tables = self.__get_elements('//div[@class="ui-vpp-highlighted-specs__striped-specs"]//table/tbody[@class="andes-table__body"]')
+        data_tables = self.__get_elements('//div[@class="ui-pdp-specs__table"]//table/tbody[@class="andes-table__body"]')
 
         data_dictionary = dict()
 
