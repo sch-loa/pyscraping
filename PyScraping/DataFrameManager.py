@@ -14,10 +14,14 @@ class DataFrameManager:
             else:
                 self.dataframe = pd.concat([self.dataframe, data_dict], axis = 0, ignore_index = True)
     
-    def export(self):
+    def export(self, product_name):
         dirr = './DataBases/'
+
+        product_name = product_name.strip()
+        product_name = product_name.replace(" ", "_")
+
         if(not os.path.exists(dirr)):
             os.makedirs(dirr)
         date_and_hour = datetime.now().strftime('(%Y-%m-%d_%Hhs%Mmins)')
-        self.dataframe.to_excel(f'{dirr}featured_products_{date_and_hour}.xlsx', sheet_name = date_and_hour)
+        self.dataframe.to_excel(f'{dirr}{product_name}_{date_and_hour}.xlsx', sheet_name = date_and_hour)
 
