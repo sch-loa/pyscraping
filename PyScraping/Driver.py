@@ -49,9 +49,12 @@ class WebDriver:
 
                 if(occurrs == 0):
                     break
+            try:
+                next_page_bttn = self.__get_element(next_page_bttn_xpath)
+                next_page_bttn.send_keys(Keys.RETURN)
+            except:
+                break
 
-            next_page_bttn = self.__get_element(next_page_bttn_xpath)
-            next_page_bttn.send_keys(Keys.RETURN)
         return featured_elements
         
     def quit(self):
