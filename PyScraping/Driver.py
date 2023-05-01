@@ -2,6 +2,7 @@ from selenium import webdriver
 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import TimeoutException
 
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -21,11 +22,8 @@ class WebDriver:
         self.wait = WebDriverWait(self.driver, 15)
 
     def goTo(self, webpage_link):
-        try:
-            self.driver.get(webpage_link)
-            self.__waitFor('//body')
-        except TimeoutError:
-            print('Loading timed out. Process was cancelled.')
+        self.driver.get(webpage_link)
+        self.__waitFor('//body')
         
     def search(self, element):
         search_bar = self.__get_element('//input[@class="nav-search-input"]')
@@ -72,18 +70,21 @@ class WebDriver:
         return self.driver.find_elements(By.XPATH, el_xpath)
     
     def __waitFor(self, el_xpath):
-        self.wait.until(ec.presence_of_element_located((By.XPATH, el_xpath)))
+        try:
+            self.wait.until(ec.presence_of_element_located((By.XPATH, el_xpath)))
+        except TimeoutException:
+            raise Exception('Loading timed out. Process was cancelled.')
 
     def __get_features(self, element):
         element.send_keys(Keys.CONTROL + Keys.RETURN)
         self.__moveTo(1)
         
         try:
-            self.__get_element('//span[contains(@class,"ui-pdp-collapsable__action")]').send_keys(Keys.RETURN)
+            self.__get_elements('//span[contains(@class,"ui-pdp-collapsable__action")]')[0].send_keys(Keys.RETURN)
         except:
             pass
 
-        data_tables = self.__get_elements('//div[@class="ui-pdp-specs__table"]//table/tbody[@class="andes-table__body"]')
+        data_tables = self.__get_elements('//div//table[@class="andes-table"]/tbody[@class="andes-table__body"]')
 
         data_dictionary = dict()
 
