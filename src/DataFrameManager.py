@@ -16,7 +16,7 @@ class DataFrameManager:
             else:
                 self.dataframe = pd.concat([self.dataframe, data_dict], axis = 0, ignore_index = True)
     
-    # Exports DataFrame as a .xlsx file through an specific route that, if it didn't exist it'd created.
+    # Exports DataFrame as a .xlsx file through an specific route that, if it didn't exist, it'd created.
     def export(self, product_name):
         dirr = './DataBases/'
 

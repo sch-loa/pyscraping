@@ -89,7 +89,7 @@ class WebDriver:
             raise Exception('Loading timed out. Process was cancelled.')
 
     # Navigates to the specific product's webpage and collects the necessary information about it.
-    # It returna a dictionary with the data.
+    # It returns a dictionary that contains the data.
     def __get_features(self, element):
         element.send_keys(Keys.CONTROL + Keys.RETURN)
         self.__moveTo(1)
