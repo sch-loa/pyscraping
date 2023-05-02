@@ -5,9 +5,11 @@ while the DataFrameManager class from the DataFrameManager module is in charge o
 
 from Driver import WebDriver
 from DataFrameManager import DataFrameManager
+from exceptions import is_positive
 
 product_name = input("Name of the product: ")
 occurrs = int(input("Maximum number of occurrences: "))
+is_positive(occurrs)
 
 # Specifies route to the ChromeDriver file, if you wanna use another version you should be able to
 # by replacing the existing file for the new one and changing the name of the file if necessary.
