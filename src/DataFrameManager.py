@@ -3,9 +3,11 @@ import os
 from datetime import datetime
 
 class DataFrameManager:
+    # Creates an empty DataFrame
     def __init__(self):
         self.dataframe = pd.DataFrame()
 
+    # Adds a list of dictionaries to the DataFrame
     def append(self, data_dicts):
         for data_dict in data_dicts:
             data_dict = pd.DataFrame(data_dict, index = range(1))
@@ -14,6 +16,7 @@ class DataFrameManager:
             else:
                 self.dataframe = pd.concat([self.dataframe, data_dict], axis = 0, ignore_index = True)
     
+    # Exports DataFrame as a .xlsx file through an specific route that, if it didn't exist it'd created.
     def export(self, product_name):
         dirr = './DataBases/'
 

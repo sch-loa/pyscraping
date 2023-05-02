@@ -11,6 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
 class WebDriver:
+    # Initializes the Chrome WebDriver with the required parameters.
     def __init__(self, chromedriver):
         self.service = Service(chromedriver)
         self.options = Options()
@@ -21,16 +22,22 @@ class WebDriver:
         self.driver = webdriver.Chrome(service = self.service, options = self.options)
         self.wait = WebDriverWait(self.driver, 15)
 
+    # Navigates to the given webpage link.
     def goTo(self, webpage_link):
         self.driver.get(webpage_link)
         self.__waitFor('//body')
-        
+
+    # Looks for specific products using the search bar.
     def search(self, element):
         search_bar = self.__get_element('//input[@class="nav-search-input"]')
 
         search_bar.send_keys(element)
         search_bar.send_keys(Keys.RETURN)
     
+
+    # Gets the links for every product in the current webpage and, one by one, navigates
+    # to them in another tab in order to collect the technical features and prices of every single one. If necessary,
+    # it repeats the same process in next page. It returns a list of dictionaries that contain the data.
     def collect_data(self, occurrs):
         element_link_xpath = '//ol/li//a[@class="ui-search-item__group__element shops__items-group-details ui-search-link"]'
         next_page_bttn_xpath = '//ul/li[contains(@class, "andes-pagination__button--next")]//a[contains(@class, "andes-pagination__link")]'
@@ -54,27 +61,35 @@ class WebDriver:
                 break
 
         return featured_elements
-        
+    
+    # Closes WebDriver
     def quit(self):
         self.driver.quit()
     
+    # Moves to another tab
     def __moveTo(self, window):
         self.driver.switch_to.window(self.driver.window_handles[window])
 
+    # Returns a single element that satisfies a given XPATH
     def __get_element(self, el_xpath):
         self.__waitFor(el_xpath)
         return self.driver.find_element(By.XPATH, el_xpath)
     
+    # Returns a list of elements that satisfy a given XPATH
     def __get_elements(self, el_xpath):
         self.__waitFor(el_xpath)
         return self.driver.find_elements(By.XPATH, el_xpath)
     
+    # Waits for a given element to load in the webpage.
+    # If it doesn't load within the specified 15 seconds, it raises an exception.
     def __waitFor(self, el_xpath):
         try:
             self.wait.until(ec.presence_of_element_located((By.XPATH, el_xpath)))
         except TimeoutException:
             raise Exception('Loading timed out. Process was cancelled.')
 
+    # Navigates to the specific product's webpage and collects the necessary information about it.
+    # It returna a dictionary with the data.
     def __get_features(self, element):
         element.send_keys(Keys.CONTROL + Keys.RETURN)
         self.__moveTo(1)
