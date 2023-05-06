@@ -10,7 +10,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
-class WebDriver:
+#Generic Web Management
+class WebDriverEssentials:
     # Initializes the Chrome WebDriver with the required parameters.
     def __init__(self, chromedriver):
         self.service = Service(chromedriver)
@@ -25,11 +26,38 @@ class WebDriver:
     # Navigates to the given webpage link.
     def goTo(self, webpage_link):
         self.driver.get(webpage_link)
-        self.__waitFor('//body')
+        self._waitFor('//body')
 
+    # Closes WebDriver
+    def quit(self):
+        self.driver.quit()
+    
+    # Moves to another tab
+    def _moveTo(self, window):
+        self.driver.switch_to.window(self.driver.window_handles[window])
+
+    # Returns a single element that satisfies a given XPATH
+    def _get_element(self, el_xpath):
+        self._waitFor(el_xpath)
+        return self.driver.find_element(By.XPATH, el_xpath)
+    
+    # Returns a list of elements that satisfy a given XPATH
+    def _get_elements(self, el_xpath):
+        self._waitFor(el_xpath)
+        return self.driver.find_elements(By.XPATH, el_xpath)
+    
+    # Waits for a given element to load in the webpage.
+    # If it doesn't load within the specified 15 seconds, it raises an exception.
+    def _waitFor(self, el_xpath):
+        try:
+            self.wait.until(ec.presence_of_element_located((By.XPATH, el_xpath)))
+        except TimeoutException:
+            raise Exception('Loading timed out. Process was cancelled.')
+
+class WebDriver(WebDriverEssentials):
     # Looks for specific products using the search bar.
     def search(self, element):
-        search_bar = self.__get_element('//input[@class="nav-search-input"]')
+        search_bar = self._get_element('//input[@class="nav-search-input"]')
 
         search_bar.send_keys(element)
         search_bar.send_keys(Keys.RETURN)
@@ -44,62 +72,37 @@ class WebDriver:
         featured_elements = list()
 
         while(occurrs > 0):
-            element_links = self.__get_elements(element_link_xpath)
+            element_links = self._get_elements(element_link_xpath)
 
             for element in element_links:
-                featured_elements.append(self.__get_features(element))
-                element_links = self.__get_elements(element_link_xpath)
+                featured_elements.append(self._get_features(element))
+                element_links = self._get_elements(element_link_xpath)
 
                 occurrs -= 1
-
+                
                 if(occurrs == 0):
                     break
+
             try:
-                next_page_bttn = self.__get_element(next_page_bttn_xpath)
+                next_page_bttn = self._get_element(next_page_bttn_xpath)
                 next_page_bttn.send_keys(Keys.RETURN)
             except:
                 break
 
         return featured_elements
     
-    # Closes WebDriver
-    def quit(self):
-        self.driver.quit()
-    
-    # Moves to another tab
-    def __moveTo(self, window):
-        self.driver.switch_to.window(self.driver.window_handles[window])
-
-    # Returns a single element that satisfies a given XPATH
-    def __get_element(self, el_xpath):
-        self.__waitFor(el_xpath)
-        return self.driver.find_element(By.XPATH, el_xpath)
-    
-    # Returns a list of elements that satisfy a given XPATH
-    def __get_elements(self, el_xpath):
-        self.__waitFor(el_xpath)
-        return self.driver.find_elements(By.XPATH, el_xpath)
-    
-    # Waits for a given element to load in the webpage.
-    # If it doesn't load within the specified 15 seconds, it raises an exception.
-    def __waitFor(self, el_xpath):
-        try:
-            self.wait.until(ec.presence_of_element_located((By.XPATH, el_xpath)))
-        except TimeoutException:
-            raise Exception('Loading timed out. Process was cancelled.')
-
     # Navigates to the specific product's webpage and collects the necessary information about it.
     # It returns a dictionary that contains the data.
-    def __get_features(self, element):
+    def _get_features(self, element):
         element.send_keys(Keys.CONTROL + Keys.RETURN)
-        self.__moveTo(1)
+        self._moveTo(1)
         
         try:
-            self.__get_elements('//span[contains(@class,"ui-pdp-collapsable__action")]')[0].send_keys(Keys.RETURN)
+            self._get_elements('//span[contains(@class,"ui-pdp-collapsable__action")]')[0].send_keys(Keys.RETURN)
         except:
             pass
 
-        data_tables = self.__get_elements('//div//table[@class="andes-table"]/tbody[@class="andes-table__body"]')
+        data_tables = self._get_elements('//div//table[@class="andes-table"]/tbody[@class="andes-table__body"]')
 
         data_dictionary = dict()
 
@@ -111,10 +114,10 @@ class WebDriver:
                 data_value = cells.find_element(By.XPATH, './/td/span[contains(@class, "andes-table__column")]').text
                 data_dictionary[data_key] = data_value
 
-                price = self.__get_element('//div[@class="ui-pdp-price__second-line"]//span[@class="andes-money-amount__fraction"]')
+                price = self._get_element('//div[@class="ui-pdp-price__second-line"]//span[@class="andes-money-amount__fraction"]')
                 data_dictionary["Precio"] = price.text
 
         self.driver.close()
-        self.__moveTo(0)
+        self._moveTo(0)
         
         return data_dictionary

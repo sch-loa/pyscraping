@@ -18,7 +18,7 @@ class DataFrameManager:
     
     # Exports DataFrame as a .xlsx file through an specific route that, if it didn't exist, it'd created.
     def export(self, product_name):
-        dirr = './DataBases/'
+        dirr = '../DataBases/'
 
         product_name = product_name.strip()
         product_name = product_name.replace(" ", "_")
