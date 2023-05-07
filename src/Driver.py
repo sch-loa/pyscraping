@@ -59,9 +59,7 @@ class WebDriver(WebDriverEssentials):
     def search(self, element):
         search_bar = self._get_element('//input[@class="nav-search-input"]')
 
-        search_bar.send_keys(element)
-        search_bar.send_keys(Keys.RETURN)
-    
+        search_bar.send_keys(element + Keys.RETURN)
 
     # Gets the links for every product in the current webpage and, one by one, navigates
     # to them in another tab in order to collect the technical features and prices of every single one. If necessary,
@@ -85,7 +83,7 @@ class WebDriver(WebDriverEssentials):
 
             try:
                 next_page_bttn = self._get_element(next_page_bttn_xpath)
-                next_page_bttn.send_keys(Keys.RETURN)
+                next_page_bttn.click()
             except:
                 break
 
@@ -94,7 +92,7 @@ class WebDriver(WebDriverEssentials):
     # Navigates to the specific product's webpage and collects the necessary information about it.
     # It returns a dictionary that contains the data.
     def _get_features(self, element):
-        element.send_keys(Keys.CONTROL + Keys.RETURN)
+        element.send_keys(Keys.CONTROL + Keys.RETURN) # opens link in new tab
         self._moveTo(1)
         
         try:
